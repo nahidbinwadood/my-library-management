@@ -1,0 +1,44 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle with gradient -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1d4ed8;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="bookGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f1f5f9;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <circle cx="32" cy="32" r="32" fill="url(#bgGradient)"/>
+  
+  <!-- Books stack -->
+  <!-- Book 1 (bottom) -->
+  <rect x="16" y="38" width="32" height="6" rx="1" fill="#ef4444" opacity="0.9"/>
+  <rect x="16" y="38" width="32" height="2" rx="1" fill="#dc2626"/>
+  
+  <!-- Book 2 (middle) -->
+  <rect x="18" y="32" width="28" height="6" rx="1" fill="#10b981" opacity="0.9"/>
+  <rect x="18" y="32" width="28" height="2" rx="1" fill="#059669"/>
+  
+  <!-- Book 3 (top) -->
+  <rect x="20" y="26" width="24" height="6" rx="1" fill="#f59e0b" opacity="0.9"/>
+  <rect x="20" y="26" width="24" height="2" rx="1" fill="#d97706"/>
+  
+  <!-- Open book on top -->
+  <path d="M32 20 L26 24 L26 30 L32 26 L38 30 L38 24 Z" fill="url(#bookGradient)" stroke="#e2e8f0" stroke-width="0.5"/>
+  <path d="M32 20 L32 26" stroke="#cbd5e1" stroke-width="0.5"/>
+  
+  <!-- Book pages lines -->
+  <line x1="28" y1="25" x2="30" y2="25" stroke="#94a3b8" stroke-width="0.5" opacity="0.7"/>
+  <line x1="28" y1="27" x2="30" y2="27" stroke="#94a3b8" stroke-width="0.5" opacity="0.7"/>
+  <line x1="34" y1="25" x2="36" y2="25" stroke="#94a3b8" stroke-width="0.5" opacity="0.7"/>
+  <line x1="34" y1="27" x2="36" y2="27" stroke="#94a3b8" stroke-width="0.5" opacity="0.7"/>
+  
+  <!-- Decorative elements -->
+  <circle cx="48" cy="16" r="2" fill="#ffffff" opacity="0.3"/>
+  <circle cx="52" cy="20" r="1.5" fill="#ffffff" opacity="0.2"/>
+  <circle cx="16" cy="16" r="1.5" fill="#ffffff" opacity="0.2"/>
+</svg>
