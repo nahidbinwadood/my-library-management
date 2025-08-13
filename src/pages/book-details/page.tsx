@@ -209,7 +209,7 @@ const BookDetails = () => {
               )}
 
               <Button asChild variant="outline" className="w-full">
-                <Link to={`/create-book/${book.id}`}>
+                <Link to={`/edit-book/${book.id}`}>
                   <Edit className="mr-2 h-4 w-4" />
                   Edit Book
                 </Link>

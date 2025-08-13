@@ -16,7 +16,11 @@ const router = createBrowserRouter([
         Component: Homepage,
       },
       {
-        path: '/create-book/:id',
+        path: '/create-book',
+        Component: CreateBook,
+      },
+      {
+        path: '/edit-book/:id',
         Component: CreateBook,
       },
       {

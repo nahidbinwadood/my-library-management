@@ -132,10 +132,7 @@ const BookColumns: ColumnDef<Book>[] = [
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <Link
-                to={`/create-book/${book.id}`}
-                className="flex items-center"
-              >
+              <Link to={`/edit-book/${book.id}`} className="flex items-center">
                 <Edit className="mr-2 h-4 w-4" />
                 Edit Book
               </Link>

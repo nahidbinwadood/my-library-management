@@ -48,7 +48,7 @@ const BookCard = ({ book }: BookCardProps) => {
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <Link
-                  to={`/create-book/${book.id}`}
+                  to={`/edit-book/${book.id}`}
                   className="flex items-center"
                 >
                   <Edit className="mr-2 h-4 w-4" />
