@@ -41,3 +41,10 @@ export interface BorrowBookData {
   quantity: number;
   dueDate: string;
 }
+export interface IStatCardData {
+  id: number;
+  title: string;
+  icon: React.ElementType;
+  stats: number;
+  description: string;
+}

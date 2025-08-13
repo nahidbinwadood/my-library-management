@@ -1,8 +1,8 @@
+import StatsCard from '@/components/common/stats-card';
 import BookCard from '@/components/homepage/book-card';
 import BookColumns from '@/components/homepage/book-column';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DataTable } from '@/components/ui/data-table';
 import {
   Select,
@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import type { Book } from '@/types';
+import type { Book, IStatCardData } from '@/types';
 import { BookOpen, Grid, List, Plus, TrendingUp } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router';
@@ -92,25 +92,36 @@ const Homepage = () => {
     return uniqueGenres.sort();
   }, []);
 
-  // Calculate statistics
-  const stats = useMemo(() => {
-    const totalBooks = mockBooks.length;
-    const availableBooks = mockBooks.filter(
-      (book) => book.available && book.copies > 0
-    ).length;
-    const totalCopies = mockBooks.reduce((sum, book) => sum + book.copies, 0);
-    const borrowedCopies = mockBooks.reduce((sum, book) => {
-      // Simulate some borrowed books
-      return sum + Math.max(0, Math.floor(Math.random() * book.copies * 0.3));
-    }, 0);
-
-    return {
-      totalBooks,
-      availableBooks,
-      totalCopies,
-      borrowedCopies,
-    };
-  }, []);
+  const statsCardInfo: IStatCardData[] = [
+    {
+      id: 1,
+      title: 'Total Books',
+      icon: BookOpen,
+      stats: 5,
+      description: `4 available`,
+    },
+    {
+      id: 2,
+      title: 'Total Copies',
+      icon: TrendingUp,
+      stats: 5,
+      description: `Across all books`,
+    },
+    {
+      id: 3,
+      title: 'Borrowed',
+      icon: BookOpen,
+      stats: 2,
+      description: `Currently on loanCurrently on loan`,
+    },
+    {
+      id: 4,
+      title: 'Genres',
+      icon: BookOpen,
+      stats: 12,
+      description: ` Different categories`,
+    },
+  ];
 
   return (
     <div className="space-y-8">
@@ -134,53 +145,9 @@ const Homepage = () => {
 
       {/* Statistics Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Books</CardTitle>
-            <BookOpen className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.totalBooks}</div>
-            <p className="text-xs text-muted-foreground">
-              {stats.availableBooks} available
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Copies</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.totalCopies}</div>
-            <p className="text-xs text-muted-foreground">Across all books</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Borrowed</CardTitle>
-            <BookOpen className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.borrowedCopies}</div>
-            <p className="text-xs text-muted-foreground">Currently on loan</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Genres</CardTitle>
-            <Badge variant="secondary">{genres.length}</Badge>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{genres.length}</div>
-            <p className="text-xs text-muted-foreground">
-              Different categories
-            </p>
-          </CardContent>
-        </Card>
+        {statsCardInfo?.map((item: IStatCardData) => (
+          <StatsCard key={item?.id} data={item} />
+        ))}
       </div>
 
       {/* Filters and View Controls */}
