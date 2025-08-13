@@ -1,4 +1,6 @@
 import MainLayout from '@/layouts/main-layout';
+import BookDetails from '@/pages/book-details/page';
+import BorrowBook from '@/pages/borrow-book';
 import BorrowSummary from '@/pages/borrow-summary/page';
 import CreateBook from '@/pages/create-book/page';
 import Homepage from '@/pages/homepage/page';
@@ -14,12 +16,20 @@ const router = createBrowserRouter([
         Component: Homepage,
       },
       {
-        path: '/create-book',
+        path: '/create-book/:id',
         Component: CreateBook,
       },
       {
         path: '/borrow-summary',
         Component: BorrowSummary,
+      },
+      {
+        path: '/books/:id',
+        Component: BookDetails,
+      },
+      {
+        path: '/borrow/:bookId',
+        Component: BorrowBook,
       },
     ],
   },

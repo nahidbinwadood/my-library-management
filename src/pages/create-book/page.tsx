@@ -4,9 +4,11 @@ import type { CreateBookData } from '@/types';
 import { ArrowLeft } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
-import { Link, useNavigate } from 'react-router';
+import { Link, useNavigate, useParams } from 'react-router';
 
 const CreateBook = () => {
+  const { id } = useParams();
+  console.log(id);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 

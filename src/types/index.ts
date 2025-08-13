@@ -21,7 +21,7 @@ export interface BorrowRecord {
   borrowedAt: string;
 }
 
-export interface BorrowSummary {
+export interface IBorrowSummary {
   bookTitle: string;
   isbn: string;
   totalQuantityBorrowed: number;
