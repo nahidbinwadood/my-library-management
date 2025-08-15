@@ -12,17 +12,17 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
+import { genres } from '@/data';
 import { useGetAllBooksQuery } from '@/store/features/books/book-api';
-import type { Book, IFilterOption, IStatCardData } from '@/types';
+import type { Book, IGenresOption, IStatCardData } from '@/types';
 import { BookOpen, Grid, List, Plus, TrendingUp } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router';
 
 const Homepage = () => {
   const query = { sortBy: 'createdAt', sort: 'asc', limit: 200 };
-  const { data, isLoading, isError } = useGetAllBooksQuery(query, {
-    refetchOnMountOrArgChange: true,
-  });
+
+  const { data, isLoading, isError } = useGetAllBooksQuery(query);
   const allBooksData = data?.data;
 
   const [viewMode, setViewMode] = useState<'table' | 'grid'>('table');
@@ -33,20 +33,6 @@ const Homepage = () => {
     if (genreFilter === 'all') return allBooksData ?? [];
     return allBooksData?.filter((book: Book) => book.genre === genreFilter);
   }, [allBooksData, genreFilter]);
-
-  // Get unique genres for filter
-  const genres: IFilterOption[] = useMemo(() => {
-    if (!allBooksData) return [];
-    const uniqueGenres: string[] = Array.from(
-      new Set(allBooksData.map((book: Book) => book.genre))
-    );
-    return uniqueGenres
-      .map((genre: string) => ({
-        label: genre.charAt(0) + genre.slice(1).toLowerCase(),
-        value: genre,
-      }))
-      .sort((a, b) => a.label.localeCompare(b.label));
-  }, [allBooksData]);
 
   // Stats data
   const statsData = useMemo(() => {
@@ -187,7 +173,7 @@ const Homepage = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Genres</SelectItem>
-                {genres?.map((genre: IFilterOption) => (
+                {genres?.map((genre: IGenresOption) => (
                   <SelectItem
                     key={genre.value}
                     value={genre.value}

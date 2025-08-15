@@ -1,6 +1,4 @@
-import type { Book, IFilterOption } from '@/types';
 import { baseApi } from '../api/api';
-import { updateGenre } from '../genre/genre-slice';
 
 const bookApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -11,31 +9,13 @@ const bookApi = baseApi.injectEndpoints({
         method: 'GET',
       }),
       providesTags: ['books'],
-      async onQueryStarted(_, { dispatch, queryFulfilled }) {
-        try {
-          const { data } = await queryFulfilled;
-          const allBooks: Book[] = data?.data ?? [];
-
-          const uniqueGenres: IFilterOption[] = Array.from(
-            new Set(allBooks.map((book) => book.genre))
-          )
-            .map((genre) => ({
-              label: genre.charAt(0) + genre.slice(1).toLowerCase(),
-              value: genre,
-            }))
-            .sort((a, b) => a.label.localeCompare(b.label));
-
-          dispatch(updateGenre(uniqueGenres));
-        } catch (error) {
-          console.error('Error updating genres in Redux:', error);
-        }
-      },
     }),
     getSingleBook: builder.query({
       query: (id) => ({
         url: `/books/${id}`,
         method: 'GET',
       }),
+      providesTags: (_, __, id) => [{ type: 'books', id }],
     }),
     createBook: builder.mutation({
       query: (formData) => ({
@@ -43,6 +23,18 @@ const bookApi = baseApi.injectEndpoints({
         method: 'POST',
         body: formData,
       }),
+      invalidatesTags: ['books'],
+    }),
+    updateBook: builder.mutation({
+      query: ({ id, formData }) => ({
+        url: `/books/${id}`,
+        method: 'PUT',
+        body: formData,
+      }),
+      invalidatesTags: (_, __, { id }) => [
+        'books', // invalidates list
+        { type: 'books', id }, // invalidates single book
+      ],
     }),
   }),
 });
@@ -51,4 +43,5 @@ export const {
   useGetAllBooksQuery,
   useGetSingleBookQuery,
   useCreateBookMutation,
+  useUpdateBookMutation,
 } = bookApi;

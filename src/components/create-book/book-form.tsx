@@ -1,5 +1,9 @@
-import { useCreateBookMutation } from '@/store/features/books/book-api';
-import type { Book, CreateBookData, IFilterOption } from '@/types';
+import { genres } from '@/data';
+import {
+  useCreateBookMutation,
+  useUpdateBookMutation,
+} from '@/store/features/books/book-api';
+import type { Book, CreateBookData, IGenresOption } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2, Save } from 'lucide-react';
 import { useForm } from 'react-hook-form';
@@ -58,10 +62,6 @@ const bookSchema = z.object({
 });
 
 export default function BookForm({ initialData }: { initialData?: Book }) {
-  const storedGenres = localStorage.getItem('genres');
-  const allGenres: IFilterOption[] = storedGenres
-    ? JSON.parse(storedGenres)
-    : [];
   const navigate = useNavigate();
   const form = useForm<CreateBookData>({
     resolver: zodResolver(bookSchema),
@@ -76,6 +76,7 @@ export default function BookForm({ initialData }: { initialData?: Book }) {
     },
   });
   const [createBook, { isLoading }] = useCreateBookMutation();
+  const [updateBook, { isLoading: updateLoading }] = useUpdateBookMutation();
 
   const handleSubmit = async (data: CreateBookData) => {
     const formData = {
@@ -83,14 +84,27 @@ export default function BookForm({ initialData }: { initialData?: Book }) {
       available: data.copies > 0 ? data.available ?? true : false,
     };
 
-    console.log(formData);
-
     try {
-      const response = await createBook(formData).unwrap();
-      if (response.success) {
-        toast.success('Book created successfully!');
-        form.reset();
-        navigate('/');
+      // create book
+      if (!initialData) {
+        const response = await createBook(formData).unwrap();
+        if (response.success) {
+          toast.success('Book created successfully!');
+          form.reset();
+          navigate('/');
+        }
+      }
+      // update book
+      else {
+        const response = await updateBook({
+          id: initialData._id,
+          formData,
+        }).unwrap();
+        if (response.success) {
+          toast.success('Book updated successfully!');
+          form.reset();
+          navigate('/');
+        }
       }
     } catch (err) {
       if (err instanceof Error) {
@@ -102,7 +116,7 @@ export default function BookForm({ initialData }: { initialData?: Book }) {
   };
 
   return (
-    <Card className="max-w-2xl mx-auto border shadow-lg">
+    <Card className="w-full mx-auto border shadow-lg">
       <CardHeader className="space-y-1">
         <CardTitle className="flex items-center gap-2 text-lg md:text-xl">
           <Save className="h-5 w-5" />
@@ -172,7 +186,7 @@ export default function BookForm({ initialData }: { initialData?: Book }) {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {allGenres.map((genre: IFilterOption) => (
+                          {genres.map((genre: IGenresOption) => (
                             <SelectItem key={genre.value} value={genre.value}>
                               {genre.label}
                             </SelectItem>
@@ -286,7 +300,7 @@ export default function BookForm({ initialData }: { initialData?: Book }) {
                 size="lg"
                 className="flex-1 sm:flex-initial cursor-pointer"
               >
-                {isLoading ? (
+                {isLoading || updateLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Processing...
@@ -294,7 +308,7 @@ export default function BookForm({ initialData }: { initialData?: Book }) {
                 ) : (
                   <>
                     <Save className="mr-2 h-4 w-4" />
-                    Create Book
+                    {initialData ? 'Update Book' : ' Create Book'}
                   </>
                 )}
               </Button>
@@ -303,7 +317,7 @@ export default function BookForm({ initialData }: { initialData?: Book }) {
                 variant="outline"
                 size="lg"
                 onClick={() => form.reset()}
-                disabled={isLoading}
+                disabled={!!initialData || isLoading}
               >
                 Reset
               </Button>

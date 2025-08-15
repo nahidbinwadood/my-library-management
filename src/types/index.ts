@@ -49,7 +49,7 @@ export interface IStatCardData {
   description: string;
 }
 
-export interface IFilterOption {
+export interface IGenresOption {
   label: string;
   value: string;
 }
