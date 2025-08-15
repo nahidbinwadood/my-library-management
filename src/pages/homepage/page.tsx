@@ -11,6 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { useGetAllBooksQuery } from '@/store/features/books/book-api';
 import type { Book, IStatCardData } from '@/types';
 import { BookOpen, Grid, List, Plus, TrendingUp } from 'lucide-react';
 import { useMemo, useState } from 'react';
@@ -75,6 +76,8 @@ const mockBooks: Book[] = [
 ];
 
 const Homepage = () => {
+  const { data } = useGetAllBooksQuery({});
+  const allBooksData = data?.data;
   const [viewMode, setViewMode] = useState<'table' | 'grid'>('table');
   const [genreFilter, setGenreFilter] = useState<string>('all');
 
@@ -98,7 +101,7 @@ const Homepage = () => {
       title: 'Total Books',
       icon: BookOpen,
       stats: 5,
-      description: `4 available`,
+      description: `${allBooksData?.length} available`,
     },
     {
       id: 2,
