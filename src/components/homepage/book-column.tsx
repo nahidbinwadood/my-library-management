@@ -36,7 +36,7 @@ const BookColumns: ColumnDef<Book>[] = [
     cell: ({ row }) => (
       <div className="font-medium">
         <Link
-          to={`/books/${row.original.id}`}
+          to={`/books/${row.original._id}`}
           className="hover:text-primary transition-colors"
         >
           {row.getValue('title')}
@@ -112,7 +112,7 @@ const BookColumns: ColumnDef<Book>[] = [
     id: 'actions',
     header: 'Actions',
     cell: ({ row }) => {
-      const book = row.original;
+      const book: Book = row.original;
 
       return (
         <DropdownMenu>
@@ -126,20 +126,20 @@ const BookColumns: ColumnDef<Book>[] = [
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
-              <Link to={`/books/${book.id}`} className="flex items-center">
+              <Link to={`/books/${book._id}`} className="flex items-center">
                 <Eye className="mr-2 h-4 w-4" />
                 View Details
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <Link to={`/edit-book/${book.id}`} className="flex items-center">
+              <Link to={`/edit-book/${book._id}`} className="flex items-center">
                 <Edit className="mr-2 h-4 w-4" />
                 Edit Book
               </Link>
             </DropdownMenuItem>
             {book.available && book.copies > 0 && (
               <DropdownMenuItem asChild>
-                <Link to={`/borrow/${book.id}`} className="flex items-center">
+                <Link to={`/borrow/${book._id}`} className="flex items-center">
                   <BookOpen className="mr-2 h-4 w-4" />
                   Borrow Book
                 </Link>

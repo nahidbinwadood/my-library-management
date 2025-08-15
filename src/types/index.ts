@@ -1,5 +1,5 @@
 export interface Book {
-  id: string;
+  _id: string;
   title: string;
   author: string;
   genre: string;
@@ -45,6 +45,11 @@ export interface IStatCardData {
   id: number;
   title: string;
   icon: React.ElementType;
-  stats: number;
+  stats: number | string;
   description: string;
+}
+
+export interface IFilterOption {
+  label: string;
+  value: string;
 }

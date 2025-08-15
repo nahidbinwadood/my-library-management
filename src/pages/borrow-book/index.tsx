@@ -9,7 +9,7 @@ import { Link, useNavigate, useParams } from 'react-router';
 // Mock data - replace with actual API call
 const mockBooks: Book[] = [
   {
-    id: '1',
+    _id: '1',
     title: 'The Great Gatsby',
     author: 'F. Scott Fitzgerald',
     genre: 'Fiction',
@@ -20,7 +20,7 @@ const mockBooks: Book[] = [
     available: true,
   },
   {
-    id: '2',
+    _id: '2',
     title: 'To Kill a Mockingbird',
     author: 'Harper Lee',
     genre: 'Fiction',
@@ -38,7 +38,7 @@ const BorrowBook = () => {
   const navigate = useNavigate();
 
   // Find the book by ID
-  const book = mockBooks.find((b) => b.id === bookId);
+  const book = mockBooks.find((b) => b._id === bookId);
 
   const handleSubmit = async (data: BorrowBookData) => {
     if (!book) return;
@@ -48,7 +48,7 @@ const BorrowBook = () => {
     try {
       // TODO: Replace with actual API call
       console.log('Borrowing book:', {
-        bookId: book.id,
+        bookId: book._id,
         bookTitle: book.title,
         ...data,
       });
@@ -98,7 +98,7 @@ const BorrowBook = () => {
         </p>
         <div className="flex gap-4">
           <Button asChild variant="outline">
-            <Link to={`/books/${book.id}`}>View Details</Link>
+            <Link to={`/books/${book._id}`}>View Details</Link>
           </Button>
           <Button asChild>
             <Link to="/books">Browse Other Books</Link>
@@ -113,7 +113,7 @@ const BorrowBook = () => {
       {/* Header */}
       <div className="flex items-center gap-4">
         <Button variant="outline" size="sm" asChild>
-          <Link to={`/books/${book.id}`}>
+          <Link to={`/books/${book._id}`}>
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Details
           </Link>

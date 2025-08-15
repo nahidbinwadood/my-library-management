@@ -143,10 +143,11 @@ export function DataTable<TData, TValue>({
           )}{' '}
           of {table.getFilteredRowModel().rows.length} entries
         </div>
-        <div className="space-x-2">
+        <div className="gap-x-2 flex items-center">
           <Button
             variant="outline"
             size="sm"
+            className="cursor-pointer"
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
           >
@@ -156,6 +157,7 @@ export function DataTable<TData, TValue>({
           <Button
             variant="outline"
             size="sm"
+            className="cursor-pointer"
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
           >

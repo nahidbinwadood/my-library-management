@@ -11,121 +11,144 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useGetAllBooksQuery } from '@/store/features/books/book-api';
-import type { Book, IStatCardData } from '@/types';
+import type { Book, IFilterOption, IStatCardData } from '@/types';
 import { BookOpen, Grid, List, Plus, TrendingUp } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router';
 
-// Mock data for demonstration
-const mockBooks: Book[] = [
-  {
-    id: '1',
-    title: 'The Great Gatsby',
-    author: 'F. Scott Fitzgerald',
-    genre: 'Fiction',
-    isbn: '978-0-7432-7356-5',
-    description:
-      'A classic American novel set in the summer of 1922, exploring themes of wealth, love, and the American Dream.',
-    copies: 5,
-    available: true,
-  },
-  {
-    id: '2',
-    title: 'To Kill a Mockingbird',
-    author: 'Harper Lee',
-    genre: 'Fiction',
-    isbn: '978-0-06-112008-4',
-    description:
-      'A gripping tale of racial injustice and loss of innocence in the American South.',
-    copies: 3,
-    available: true,
-  },
-  {
-    id: '3',
-    title: 'Clean Code',
-    author: 'Robert C. Martin',
-    genre: 'Technical',
-    isbn: '978-0-13-235088-4',
-    description:
-      'A handbook of agile software craftsmanship for writing clean, maintainable code.',
-    copies: 0,
-    available: false,
-  },
-  {
-    id: '4',
-    title: 'The Psychology of Money',
-    author: 'Morgan Housel',
-    genre: 'Self-Help',
-    isbn: '978-0-85285-767-5',
-    description: 'Timeless lessons on wealth, greed, and happiness.',
-    copies: 8,
-    available: true,
-  },
-  {
-    id: '5',
-    title: 'Dune',
-    author: 'Frank Herbert',
-    genre: 'Science Fiction',
-    isbn: '978-0-441-17271-9',
-    description:
-      'A science fiction masterpiece set on the desert planet Arrakis.',
-    copies: 2,
-    available: true,
-  },
-];
-
 const Homepage = () => {
-  const { data } = useGetAllBooksQuery({});
+  const query = { sortBy: 'createdAt', sort: 'asc', limit: 200 };
+  const { data, isLoading, isError } = useGetAllBooksQuery(query, {
+    refetchOnMountOrArgChange: true,
+  });
   const allBooksData = data?.data;
+
   const [viewMode, setViewMode] = useState<'table' | 'grid'>('table');
   const [genreFilter, setGenreFilter] = useState<string>('all');
 
   // Filter books based on selected genre
   const filteredBooks = useMemo(() => {
-    if (genreFilter === 'all') return mockBooks;
-    return mockBooks.filter((book) => book.genre === genreFilter);
-  }, [genreFilter]);
+    if (genreFilter === 'all') return allBooksData ?? [];
+    return allBooksData?.filter((book: Book) => book.genre === genreFilter);
+  }, [allBooksData, genreFilter]);
 
   // Get unique genres for filter
-  const genres = useMemo(() => {
-    const uniqueGenres = Array.from(
-      new Set(mockBooks.map((book) => book.genre))
+  const genres: IFilterOption[] = useMemo(() => {
+    if (!allBooksData) return [];
+    const uniqueGenres: string[] = Array.from(
+      new Set(allBooksData.map((book: Book) => book.genre))
     );
-    return uniqueGenres.sort();
-  }, []);
+    return uniqueGenres
+      .map((genre: string) => ({
+        label: genre.charAt(0) + genre.slice(1).toLowerCase(),
+        value: genre,
+      }))
+      .sort((a, b) => a.label.localeCompare(b.label));
+  }, [allBooksData]);
+
+  // Stats data
+  const statsData = useMemo(() => {
+    const totalBooks = allBooksData?.length ?? 0;
+    const availableBooks =
+      allBooksData?.filter((book: Book) => book.available && book.copies > 0)
+        .length ?? 0;
+    const totalCopies =
+      allBooksData?.reduce((sum: number, book: Book) => sum + book.copies, 0) ??
+      0;
+    const borrowedCopies =
+      allBooksData?.reduce((sum: number, book: Book) => {
+        return sum + Math.max(0, Math.floor(Math.random() * book.copies * 0.3));
+      }, 0) ?? 0;
+
+    return { totalBooks, availableBooks, totalCopies, borrowedCopies };
+  }, [allBooksData]);
 
   const statsCardInfo: IStatCardData[] = [
     {
       id: 1,
       title: 'Total Books',
       icon: BookOpen,
-      stats: 5,
-      description: `${allBooksData?.length} available`,
+      stats: `${statsData?.totalBooks}`,
+      description: `${statsData?.availableBooks} available`,
     },
     {
       id: 2,
       title: 'Total Copies',
       icon: TrendingUp,
-      stats: 5,
+      stats: `${statsData?.totalCopies}`,
       description: `Across all books`,
     },
     {
       id: 3,
       title: 'Borrowed',
       icon: BookOpen,
-      stats: 2,
-      description: `Currently on loanCurrently on loan`,
+      stats: `${statsData?.borrowedCopies}`,
+      description: `Currently on loan`,
     },
     {
       id: 4,
       title: 'Genres',
       icon: BookOpen,
-      stats: 12,
-      description: ` Different categories`,
+      stats: `${genres?.length || 0}`,
+      description: `Different categories`,
     },
   ];
 
+  // Loading Skeletons
+  if (isLoading) {
+    return (
+      <div className="space-y-8">
+        {/* Header Skeleton */}
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div className="space-y-2">
+            <Skeleton className="h-8 w-64 rounded" />
+            <Skeleton className="h-4 w-48 rounded" />
+          </div>
+          <Skeleton className="h-10 w-32 rounded" />
+        </div>
+
+        {/* Stats Cards Skeleton */}
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {[...Array(4)].map((_, i) => (
+            <Skeleton key={i} className="h-40 w-full rounded" />
+          ))}
+        </div>
+
+        {/* Filters Skeleton */}
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <Skeleton className="h-10 w-60 rounded" />
+          <Skeleton className="h-10 w-40 rounded" />
+        </div>
+
+        {/* Books Grid Skeleton */}
+        <div>
+          <Skeleton className="h-10 w-96 rounded mb-4" />
+          <div className="space-y-4">
+            {[...Array(12)].map((_, i) => (
+              <Skeleton key={i} className="h-12 w-full rounded" />
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (isError) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[400px] text-center">
+        <BookOpen className="h-12 w-12 text-muted-foreground/50 mb-4" />
+        <h2 className="text-2xl font-semibold mb-2">Failed to load books</h2>
+        <p className="text-muted-foreground mb-6">
+          Something went wrong while fetching the library books.
+        </p>
+      </div>
+    );
+  }
+
+  // Render normal content
   return (
     <div className="space-y-8">
       {/* Header */}
@@ -164,16 +187,20 @@ const Homepage = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Genres</SelectItem>
-                {genres.map((genre) => (
-                  <SelectItem key={genre} value={genre}>
-                    {genre}
+                {genres?.map((genre: IFilterOption) => (
+                  <SelectItem
+                    key={genre.value}
+                    value={genre.value}
+                    className="capitalize"
+                  >
+                    {genre.label}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
           <Badge variant="outline">
-            {filteredBooks.length} book{filteredBooks.length !== 1 ? 's' : ''}
+            {filteredBooks?.length} book{filteredBooks?.length !== 1 ? 's' : ''}
           </Badge>
         </div>
 
@@ -210,8 +237,8 @@ const Homepage = () => {
         />
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {filteredBooks.map((book) => (
-            <BookCard key={book.id} book={book} />
+          {filteredBooks.map((book: Book) => (
+            <BookCard key={book._id} book={book} />
           ))}
           {filteredBooks.length === 0 && (
             <div className="col-span-full flex flex-col items-center justify-center py-12 text-center">

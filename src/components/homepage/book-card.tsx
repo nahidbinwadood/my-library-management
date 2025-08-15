@@ -23,7 +23,7 @@ const BookCard = ({ book }: BookCardProps) => {
         <div className="flex items-start justify-between">
           <div className="flex-1 min-w-0">
             <CardTitle className="text-lg leading-tight mb-1 group-hover:text-primary transition-colors">
-              <Link to={`/books/${book.id}`} className="hover:underline">
+              <Link to={`/books/${book._id}`} className="hover:underline">
                 {book.title}
               </Link>
             </CardTitle>
@@ -41,14 +41,14 @@ const BookCard = ({ book }: BookCardProps) => {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-40">
               <DropdownMenuItem asChild>
-                <Link to={`/books/${book.id}`} className="flex items-center">
+                <Link to={`/books/${book._id}`} className="flex items-center">
                   <Eye className="mr-2 h-4 w-4" />
                   View
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <Link
-                  to={`/edit-book/${book.id}`}
+                  to={`/edit-book/${book._id}`}
                   className="flex items-center"
                 >
                   <Edit className="mr-2 h-4 w-4" />
@@ -57,7 +57,10 @@ const BookCard = ({ book }: BookCardProps) => {
               </DropdownMenuItem>
               {book.available && book.copies > 0 && (
                 <DropdownMenuItem asChild>
-                  <Link to={`/borrow/${book.id}`} className="flex items-center">
+                  <Link
+                    to={`/borrow/${book._id}`}
+                    className="flex items-center"
+                  >
                     <BookOpen className="mr-2 h-4 w-4" />
                     Borrow
                   </Link>
@@ -101,7 +104,7 @@ const BookCard = ({ book }: BookCardProps) => {
 
             <div className="flex gap-2">
               <Button asChild size="sm" variant="outline">
-                <Link to={`/books/${book.id}`}>
+                <Link to={`/books/${book._id}`}>
                   <Eye className="h-4 w-4 mr-1" />
                   View
                 </Link>
@@ -109,7 +112,7 @@ const BookCard = ({ book }: BookCardProps) => {
 
               {book.available && book.copies > 0 && (
                 <Button asChild size="sm">
-                  <Link to={`/borrow/${book.id}`}>
+                  <Link to={`/borrow/${book._id}`}>
                     <BookOpen className="h-4 w-4 mr-1" />
                     Borrow
                   </Link>

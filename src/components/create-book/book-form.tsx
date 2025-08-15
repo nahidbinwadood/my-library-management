@@ -1,10 +1,19 @@
-import type { Book, CreateBookData } from '@/types';
+import { useCreateBookMutation } from '@/store/features/books/book-api';
+import type { Book, CreateBookData, IFilterOption } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2, Save } from 'lucide-react';
 import { useForm } from 'react-hook-form';
+import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router';
 import * as z from 'zod';
 import { Button } from '../ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '../ui/card';
 import {
   Form,
   FormControl,
@@ -22,6 +31,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../ui/select';
+import { Separator } from '../ui/separator';
 import { Switch } from '../ui/switch';
 import { Textarea } from '../ui/textarea';
 
@@ -47,33 +57,12 @@ const bookSchema = z.object({
   available: z.boolean().optional(),
 });
 
-const genres = [
-  'Fiction',
-  'Non-Fiction',
-  'Mystery',
-  'Romance',
-  'Science Fiction',
-  'Fantasy',
-  'Thriller',
-  'Biography',
-  'History',
-  'Self-Help',
-  'Technical',
-  'Other',
-];
-
-interface BookFormProps {
-  initialData?: Book;
-  onSubmit: (data: CreateBookData) => void;
-  isLoading?: boolean;
-  submitButtonText?: string;
-}
-const BookForm = ({
-  initialData,
-  onSubmit,
-  isLoading = false,
-  submitButtonText = 'Create Book',
-}: BookFormProps) => {
+export default function BookForm({ initialData }: { initialData?: Book }) {
+  const storedGenres = localStorage.getItem('genres');
+  const allGenres: IFilterOption[] = storedGenres
+    ? JSON.parse(storedGenres)
+    : [];
+  const navigate = useNavigate();
   const form = useForm<CreateBookData>({
     resolver: zodResolver(bookSchema),
     defaultValues: {
@@ -86,108 +75,139 @@ const BookForm = ({
       available: initialData?.available ?? true,
     },
   });
+  const [createBook, { isLoading }] = useCreateBookMutation();
 
-  const handleSubmit = (data: CreateBookData) => {
-    // If copies is 0, mark as unavailable
+  const handleSubmit = async (data: CreateBookData) => {
     const formData = {
       ...data,
       available: data.copies > 0 ? data.available ?? true : false,
     };
-    onSubmit(formData);
+
+    console.log(formData);
+
+    try {
+      const response = await createBook(formData).unwrap();
+      if (response.success) {
+        toast.success('Book created successfully!');
+        form.reset();
+        navigate('/');
+      }
+    } catch (err) {
+      if (err instanceof Error) {
+        toast.error(err.message);
+      } else {
+        toast.error('Failed to create book');
+      }
+    }
   };
+
   return (
-    <Card className="max-w-2xl mx-auto">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+    <Card className="max-w-2xl mx-auto border shadow-lg">
+      <CardHeader className="space-y-1">
+        <CardTitle className="flex items-center gap-2 text-lg md:text-xl">
           <Save className="h-5 w-5" />
           {initialData ? 'Edit Book' : 'Add New Book'}
         </CardTitle>
+        <CardDescription>
+          Fill in the details below to{' '}
+          {initialData ? 'update this book' : 'add a new book to the library'}.
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(handleSubmit)}
-            className="space-y-6"
-          >
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <FormField
-                control={form.control}
-                name="title"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Title *</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter book title..." {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="author"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Author *</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter author name..." {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="genre"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Genre *</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
+          <form onSubmit={form.handleSubmit(handleSubmit)}>
+            {/* Book Info */}
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField
+                  control={form.control}
+                  name="title"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Title *</FormLabel>
                       <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select genre..." />
-                        </SelectTrigger>
+                        <Input
+                          className="focus:ring-2 focus:ring-primary/50"
+                          placeholder="Enter book title..."
+                          {...field}
+                        />
                       </FormControl>
-                      <SelectContent>
-                        {genres.map((genre) => (
-                          <SelectItem key={genre} value={genre}>
-                            {genre}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="author"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Author *</FormLabel>
+                      <FormControl>
+                        <Input
+                          className="focus:ring-2 focus:ring-primary/50"
+                          placeholder="Enter author name..."
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
-              <FormField
-                control={form.control}
-                name="isbn"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>ISBN *</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Enter ISBN..."
-                        {...field}
-                        className="font-mono"
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      10 or 13 digit ISBN number
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField
+                  control={form.control}
+                  name="genre"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Genre *</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger className="focus:ring-2 focus:ring-primary/50 w-full">
+                            <SelectValue placeholder="Select genre..." />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {allGenres.map((genre: IFilterOption) => (
+                            <SelectItem key={genre.value} value={genre.value}>
+                              {genre.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="isbn"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>ISBN *</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          className="focus:ring-2 focus:ring-primary/50 font-inter"
+                          placeholder="Enter ISBN..."
+                          {...field}
+                        />
+                      </FormControl>
+
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
             </div>
 
+            <Separator className="my-6" />
+
+            {/* Description */}
             <FormField
               control={form.control}
               name="description"
@@ -197,7 +217,7 @@ const BookForm = ({
                   <FormControl>
                     <Textarea
                       placeholder="Enter book description..."
-                      className="resize-none"
+                      className="resize-none focus:ring-2 focus:ring-primary/50"
                       rows={4}
                       {...field}
                     />
@@ -207,7 +227,10 @@ const BookForm = ({
               )}
             />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Separator className="my-6" />
+
+            {/* Availability */}
+            <div className="space-y-4">
               <FormField
                 control={form.control}
                 name="copies"
@@ -218,6 +241,7 @@ const BookForm = ({
                       <Input
                         type="number"
                         placeholder="0"
+                        className="focus:ring-2 focus:ring-primary/50"
                         {...field}
                         onChange={(e) =>
                           field.onChange(parseInt(e.target.value) || 0)
@@ -231,12 +255,11 @@ const BookForm = ({
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
                 name="available"
                 render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 bg-muted/50">
                     <div className="space-y-0.5">
                       <FormLabel className="text-base">Available</FormLabel>
                       <FormDescription>
@@ -255,11 +278,13 @@ const BookForm = ({
               />
             </div>
 
-            <div className="flex gap-4 pt-4">
+            {/* Actions */}
+            <div className="flex flex-col sm:flex-row md:justify-between gap-4 pt-4">
               <Button
                 type="submit"
                 disabled={isLoading}
-                className="flex-1 md:flex-initial"
+                size="lg"
+                className="flex-1 sm:flex-initial cursor-pointer"
               >
                 {isLoading ? (
                   <>
@@ -269,13 +294,14 @@ const BookForm = ({
                 ) : (
                   <>
                     <Save className="mr-2 h-4 w-4" />
-                    {submitButtonText}
+                    Create Book
                   </>
                 )}
               </Button>
               <Button
                 type="button"
                 variant="outline"
+                size="lg"
                 onClick={() => form.reset()}
                 disabled={isLoading}
               >
@@ -287,6 +313,4 @@ const BookForm = ({
       </CardContent>
     </Card>
   );
-};
-
-export default BookForm;
+}
