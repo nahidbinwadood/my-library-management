@@ -20,7 +20,11 @@ import {
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
 
-const BookColumns: ColumnDef<Book>[] = [
+const BookColumns = ({
+  onDeleteRequest,
+}: {
+  onDeleteRequest: (book: Book) => void;
+}): ColumnDef<Book>[] => [
   {
     accessorKey: 'title',
     header: ({ column }) => (
@@ -146,7 +150,10 @@ const BookColumns: ColumnDef<Book>[] = [
               </DropdownMenuItem>
             )}
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-destructive flex items-center">
+            <DropdownMenuItem
+              onClick={() => onDeleteRequest(book)}
+              className="text-destructive flex items-center"
+            >
               <Trash2 className="mr-2 h-4 w-4" />
               Delete Book
             </DropdownMenuItem>

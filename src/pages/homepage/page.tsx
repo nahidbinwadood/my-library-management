@@ -1,9 +1,10 @@
 import StatsCard from '@/components/common/stats-card';
-import BookCard from '@/components/homepage/book-card';
-import BookColumns from '@/components/homepage/book-column';
+import AllBooks from '@/components/homepage/all-books';
+import HomepageError from '@/components/homepage/homepage-error';
+import HomepageHeader from '@/components/homepage/homepage-header';
+import HomepageSkeleton from '@/components/homepage/homepage-skeleton';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { DataTable } from '@/components/ui/data-table';
 import {
   Select,
   SelectContent,
@@ -11,16 +12,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Skeleton } from '@/components/ui/skeleton';
 import { genres } from '@/data';
 import { useGetAllBooksQuery } from '@/store/features/books/book-api';
 import type { Book, IGenresOption, IStatCardData } from '@/types';
-import { BookOpen, Grid, List, Plus, TrendingUp } from 'lucide-react';
+import { BookOpen, Grid, List, TrendingUp } from 'lucide-react';
 import { useMemo, useState } from 'react';
-import { Link } from 'react-router';
 
 const Homepage = () => {
-  const query = { sortBy: 'createdAt', sort: 'asc', limit: 200 };
+  const query = {
+    sortBy: 'createdAt',
+    sort: 'asc',
+    limit: 200,
+  };
 
   const { data, isLoading, isError } = useGetAllBooksQuery(query);
   const allBooksData = data?.data;
@@ -84,76 +87,19 @@ const Homepage = () => {
 
   // Loading Skeletons
   if (isLoading) {
-    return (
-      <div className="space-y-8">
-        {/* Header Skeleton */}
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div className="space-y-2">
-            <Skeleton className="h-8 w-64 rounded" />
-            <Skeleton className="h-4 w-48 rounded" />
-          </div>
-          <Skeleton className="h-10 w-32 rounded" />
-        </div>
-
-        {/* Stats Cards Skeleton */}
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {[...Array(4)].map((_, i) => (
-            <Skeleton key={i} className="h-40 w-full rounded" />
-          ))}
-        </div>
-
-        {/* Filters Skeleton */}
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <Skeleton className="h-10 w-60 rounded" />
-          <Skeleton className="h-10 w-40 rounded" />
-        </div>
-
-        {/* Books Grid Skeleton */}
-        <div>
-          <Skeleton className="h-10 w-96 rounded mb-4" />
-          <div className="space-y-4">
-            {[...Array(12)].map((_, i) => (
-              <Skeleton key={i} className="h-12 w-full rounded" />
-            ))}
-          </div>
-        </div>
-      </div>
-    );
+    return <HomepageSkeleton />;
   }
 
   // Error state
   if (isError) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] text-center">
-        <BookOpen className="h-12 w-12 text-muted-foreground/50 mb-4" />
-        <h2 className="text-2xl font-semibold mb-2">Failed to load books</h2>
-        <p className="text-muted-foreground mb-6">
-          Something went wrong while fetching the library books.
-        </p>
-      </div>
-    );
+    return <HomepageError />;
   }
 
   // Render normal content
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Library Books</h1>
-          <p className="text-muted-foreground">
-            Manage and browse all books in the library collection
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button asChild>
-            <Link to="/create-book">
-              <Plus className="mr-2 h-4 w-4" />
-              Add Book
-            </Link>
-          </Button>
-        </div>
-      </div>
+      <HomepageHeader />
 
       {/* Statistics Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -214,37 +160,11 @@ const Homepage = () => {
       </div>
 
       {/* Books Display */}
-      {viewMode === 'table' ? (
-        <DataTable
-          columns={BookColumns}
-          data={filteredBooks}
-          searchKey="title"
-          searchPlaceholder="Search books by title..."
-        />
-      ) : (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {filteredBooks.map((book: Book) => (
-            <BookCard key={book._id} book={book} />
-          ))}
-          {filteredBooks.length === 0 && (
-            <div className="col-span-full flex flex-col items-center justify-center py-12 text-center">
-              <BookOpen className="h-12 w-12 text-muted-foreground/50 mb-4" />
-              <h3 className="text-lg font-semibold mb-2">No books found</h3>
-              <p className="text-muted-foreground mb-4">
-                {genreFilter === 'all'
-                  ? 'There are no books in the library yet.'
-                  : `No books found in the "${genreFilter}" genre.`}
-              </p>
-              <Button asChild>
-                <Link to="/create-book">
-                  <Plus className="mr-2 h-4 w-4" />
-                  Add First Book
-                </Link>
-              </Button>
-            </div>
-          )}
-        </div>
-      )}
+      <AllBooks
+        filteredBooks={filteredBooks}
+        viewMode={viewMode}
+        genreFilter={genreFilter}
+      />
     </div>
   );
 };

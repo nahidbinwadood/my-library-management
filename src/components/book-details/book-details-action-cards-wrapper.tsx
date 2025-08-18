@@ -1,28 +1,14 @@
 import type { Book } from '@/types';
 import { BookOpen, Edit, Trash2 } from 'lucide-react';
-import { Link, useNavigate } from 'react-router';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '../ui/alert-dialog';
+import { useState } from 'react';
+import { Link } from 'react-router';
+import DeleteAlert from '../common/delete-alert';
 import { Button } from '../ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 
 const BookDetailsActionCardWrapper = ({ book }: { book: Book }) => {
-  const navigate = useNavigate();
+  const [open, setOpen] = useState<boolean>(false);
 
-  const handleDelete = () => {
-    // TODO: Implement delete functionality
-    console.log('Delete book:', book._id);
-    navigate('/books');
-  };
   return (
     <div className="space-y-6">
       {/* Actions Card */}
@@ -46,33 +32,14 @@ const BookDetailsActionCardWrapper = ({ book }: { book: Book }) => {
               Edit Book
             </Link>
           </Button>
-
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button variant="destructive" className="w-full">
-                <Trash2 className="mr-2 h-4 w-4" />
-                Delete Book
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This action cannot be undone. This will permanently delete "
-                  {book.title}" from the library system.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={handleDelete}
-                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                >
-                  Delete Book
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+          <Button
+            onClick={() => setOpen(true)}
+            variant="destructive"
+            className="w-full"
+          >
+            <Trash2 className="mr-2 h-4 w-4" />
+            Delete Book
+          </Button>
         </CardContent>
       </Card>
 
@@ -124,6 +91,14 @@ const BookDetailsActionCardWrapper = ({ book }: { book: Book }) => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Delete Modal */}
+      <DeleteAlert
+        open={open}
+        setOpen={setOpen}
+        id={book?._id}
+        title={`This action cannot be undone. This will permanently delete "${book.title}" from the library system.`}
+      />
     </div>
   );
 };

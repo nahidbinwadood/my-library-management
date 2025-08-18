@@ -5,6 +5,7 @@ import {
 } from '@/store/features/books/book-api';
 import type { Book, CreateBookData, IGenresOption } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
+import type { FetchBaseQueryError } from '@reduxjs/toolkit/query';
 import { Loader2, Save } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
@@ -106,11 +107,23 @@ export default function BookForm({ initialData }: { initialData?: Book }) {
           navigate('/');
         }
       }
-    } catch (err) {
-      if (err instanceof Error) {
-        toast.error(err.message);
+    } catch (error) {
+      const err = error as FetchBaseQueryError;
+
+      if ('data' in err && typeof err.data === 'object' && err.data !== null) {
+        // Cast to match your API error shape
+        const serverData = err.data as {
+          message?: string;
+          error?: { message?: string };
+        };
+
+        toast.error(
+          serverData.error?.message ??
+            serverData.message ??
+            'Failed to delete book'
+        );
       } else {
-        toast.error('Failed to create book');
+        toast.error('Failed to delete book');
       }
     }
   };
