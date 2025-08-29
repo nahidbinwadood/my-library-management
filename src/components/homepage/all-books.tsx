@@ -38,7 +38,11 @@ const AllBooks = ({
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {filteredBooks.map((book: Book) => (
-            <BookCard key={book._id} book={book} />
+            <BookCard
+              onDeleteRequest={handleDeleteRequest}
+              key={book._id}
+              book={book}
+            />
           ))}
           {filteredBooks.length === 0 && (
             <div className="col-span-full flex flex-col items-center justify-center py-12 text-center">

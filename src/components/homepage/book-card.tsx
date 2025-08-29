@@ -14,9 +14,10 @@ import {
 
 interface BookCardProps {
   book: Book;
+  onDeleteRequest: (book: Book) => void;
 }
 
-const BookCard = ({ book }: BookCardProps) => {
+const BookCard = ({ book, onDeleteRequest }: BookCardProps) => {
   return (
     <Card className="group hover:shadow-md transition-all duration-200 hover:-translate-y-1">
       <CardHeader className="pb-3">
@@ -67,7 +68,10 @@ const BookCard = ({ book }: BookCardProps) => {
                 </DropdownMenuItem>
               )}
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-destructive">
+              <DropdownMenuItem
+                onClick={() => onDeleteRequest(book)}
+                className="text-destructive"
+              >
                 <Trash2 className="mr-2 h-4 w-4" />
                 Delete
               </DropdownMenuItem>

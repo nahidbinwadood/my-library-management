@@ -72,7 +72,7 @@ export default function BookForm({ initialData }: { initialData?: Book }) {
       genre: initialData?.genre || '',
       isbn: initialData?.isbn || '',
       description: initialData?.description || '',
-      copies: initialData?.copies || 1,
+      copies: initialData?.copies ?? 0,
       available: initialData?.available ?? true,
     },
   });
@@ -127,6 +127,7 @@ export default function BookForm({ initialData }: { initialData?: Book }) {
       }
     }
   };
+  const numberOfCopies = form.watch('copies');
 
   return (
     <Card className="w-full mx-auto border shadow-lg">
@@ -267,12 +268,15 @@ export default function BookForm({ initialData }: { initialData?: Book }) {
                     <FormControl>
                       <Input
                         type="number"
-                        placeholder="0"
+                        min={0}
+                        placeholder="Enter Number of Copies"
                         className="focus:ring-2 focus:ring-primary/50"
                         {...field}
-                        onChange={(e) =>
-                          field.onChange(parseInt(e.target.value) || 0)
-                        }
+                        onChange={(e) => {
+                          const value =
+                            e.target.value === '' ? '' : Number(e.target.value);
+                          field.onChange(value);
+                        }}
                       />
                     </FormControl>
                     <FormDescription>
@@ -295,9 +299,9 @@ export default function BookForm({ initialData }: { initialData?: Book }) {
                     </div>
                     <FormControl>
                       <Switch
-                        checked={field.value}
+                        checked={numberOfCopies > 0 || field.value}
                         onCheckedChange={field.onChange}
-                        disabled={form.watch('copies') === 0}
+                        disabled={numberOfCopies === 0}
                       />
                     </FormControl>
                   </FormItem>
@@ -309,7 +313,7 @@ export default function BookForm({ initialData }: { initialData?: Book }) {
             <div className="flex flex-col sm:flex-row md:justify-between gap-4 pt-4">
               <Button
                 type="submit"
-                disabled={isLoading}
+                disabled={isLoading || updateLoading}
                 size="lg"
                 className="flex-1 sm:flex-initial cursor-pointer"
               >

@@ -3,6 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { BookOpen, Calendar, Loader2 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import z from 'zod';
+import { DatePicker } from '../common/date-picker';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
@@ -34,20 +35,10 @@ const BorrowForm = ({ book, onSubmit, isLoading = false }: BorrowFormProps) => {
       quantity: 1,
       dueDate: '',
     },
+    mode: 'onChange',
   });
 
-  // Get minimum date (today)
   const today = new Date();
-  const minDate = today.toISOString().split('T')[0];
-
-  // Get default due date (2 weeks from today)
-  const defaultDueDate = new Date(today.getTime() + 14 * 24 * 60 * 60 * 1000);
-  const defaultDateStr = defaultDueDate.toISOString().split('T')[0];
-
-  // Set default due date
-  if (!form.getValues('dueDate')) {
-    form.setValue('dueDate', defaultDateStr);
-  }
 
   const handleSubmit = (data: BorrowBookData) => {
     onSubmit(data);
@@ -58,6 +49,12 @@ const BorrowForm = ({ book, onSubmit, isLoading = false }: BorrowFormProps) => {
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight">Borrow Book</h1>
+        <p className="text-muted-foreground">
+          Complete the form below to borrow this book
+        </p>
+      </div>
       {/* Book Info Card */}
       <Card>
         <CardHeader>
@@ -116,7 +113,6 @@ const BorrowForm = ({ book, onSubmit, isLoading = false }: BorrowFormProps) => {
           </div>
         </CardContent>
       </Card>
-
       {/* Borrow Form Card */}
       <Card>
         <CardHeader>
@@ -170,7 +166,15 @@ const BorrowForm = ({ book, onSubmit, isLoading = false }: BorrowFormProps) => {
                     <FormItem>
                       <FormLabel>Due Date *</FormLabel>
                       <FormControl>
-                        <Input type="date" min={minDate} {...field} />
+                        <DatePicker
+                          date={field.value ? new Date(field.value) : undefined}
+                          onDateChange={(date) =>
+                            field.onChange(date ? date.toISOString() : '')
+                          }
+                          placeholder="Select due date"
+                          minDate={today}
+                          className="w-full"
+                        />
                       </FormControl>
                       <FormDescription>
                         Select the return due date

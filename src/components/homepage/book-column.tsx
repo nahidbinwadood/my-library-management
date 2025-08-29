@@ -97,7 +97,7 @@ const BookColumns = ({
   },
   {
     accessorKey: 'available',
-    header: 'Status',
+    header: 'Availability',
     cell: ({ row }) => {
       const available = row.getValue('available') as boolean;
       const copies = row.getValue('copies') as number;

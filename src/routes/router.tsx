@@ -1,6 +1,6 @@
 import MainLayout from '@/layouts/main-layout';
 import BookDetails from '@/pages/book-details/page';
-import BorrowBook from '@/pages/borrow-book';
+import BorrowBook from '@/pages/borrow-book/page';
 import BorrowSummary from '@/pages/borrow-summary/page';
 import CreateBook from '@/pages/create-book/page';
 import Homepage from '@/pages/homepage/page';
