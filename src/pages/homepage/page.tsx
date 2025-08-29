@@ -1,8 +1,8 @@
+import { StatsCardSkeleton } from '@/components/borrow-summary/borrow-summary-stats-card-skeleton';
 import StatsCard from '@/components/common/stats-card';
 import AllBooks from '@/components/homepage/all-books';
 import HomepageError from '@/components/homepage/homepage-error';
 import HomepageHeader from '@/components/homepage/homepage-header';
-import HomepageSkeleton from '@/components/homepage/homepage-skeleton';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -12,6 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Skeleton } from '@/components/ui/skeleton';
 import { genres } from '@/data';
 import { useGetAllBooksQuery } from '@/store/features/books/book-api';
 import type { Book, IGenresOption, IStatCardData } from '@/types';
@@ -58,37 +59,32 @@ const Homepage = () => {
     {
       id: 1,
       title: 'Total Books',
-      icon: BookOpen,
+      icon: <BookOpen className="h-4 w-4 text-muted-foreground" />,
       stats: `${statsData?.totalBooks}`,
       description: `${statsData?.availableBooks} available`,
     },
     {
       id: 2,
       title: 'Total Copies',
-      icon: TrendingUp,
+      icon: <TrendingUp className="h-4 w-4 text-muted-foreground" />,
       stats: `${statsData?.totalCopies}`,
       description: `Across all books`,
     },
     {
       id: 3,
       title: 'Borrowed',
-      icon: BookOpen,
+      icon: <BookOpen className="h-4 w-4 text-muted-foreground" />,
       stats: `${statsData?.borrowedCopies}`,
       description: `Currently on loan`,
     },
     {
       id: 4,
       title: 'Genres',
-      icon: BookOpen,
+      icon: <BookOpen className="h-4 w-4 text-muted-foreground" />,
       stats: `${genres?.length || 0}`,
       description: `Different categories`,
     },
   ];
-
-  // Loading Skeletons
-  if (isLoading) {
-    return <HomepageSkeleton />;
-  }
 
   // Error state
   if (isError) {
@@ -100,70 +96,98 @@ const Homepage = () => {
     <div className="space-y-8">
       {/* Header */}
       <HomepageHeader />
-
       {/* Statistics Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {statsCardInfo?.map((item: IStatCardData) => (
-          <StatsCard key={item?.id} data={item} />
-        ))}
+        {isLoading
+          ? [...Array(4)].map((_, i) => <StatsCardSkeleton key={i} />)
+          : statsCardInfo?.map((item: IStatCardData) => (
+              <StatsCard key={item?.id} data={item} />
+            ))}
+        {}
       </div>
-
       {/* Filters and View Controls */}
+
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-medium">Genre:</span>
-            <Select value={genreFilter} onValueChange={setGenreFilter}>
-              <SelectTrigger className="w-40">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Genres</SelectItem>
-                {genres?.map((genre: IGenresOption) => (
-                  <SelectItem
-                    key={genre.value}
-                    value={genre.value}
-                    className="capitalize"
-                  >
-                    {genre.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <Badge variant="outline">
-            {filteredBooks?.length} book{filteredBooks?.length !== 1 ? 's' : ''}
-          </Badge>
-        </div>
+        {isLoading ? (
+          // Skeleton while loading
+          <>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <Skeleton className="h-5 w-12" /> {/* "Genre:" text */}
+                <Skeleton className="h-9 w-40 rounded-md" /> {/* Select */}
+              </div>
+              <Skeleton className="h-6 w-16 rounded-md" /> {/* Badge */}
+            </div>
 
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-medium">View:</span>
-          <div className="flex rounded-md border">
-            <Button
-              variant={viewMode === 'table' ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => setViewMode('table')}
-              className="rounded-r-none"
-            >
-              <List className="h-4 w-4" />
-            </Button>
-            <Button
-              variant={viewMode === 'grid' ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => setViewMode('grid')}
-              className="rounded-l-none"
-            >
-              <Grid className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
+            <div className="flex items-center gap-2">
+              <Skeleton className="h-5 w-10" /> {/* "View:" text */}
+              <div className="flex rounded-md border">
+                <Skeleton className="h-9 w-9 rounded-r-none" />{' '}
+                {/* Table btn */}
+                <Skeleton className="h-9 w-9 rounded-l-none" /> {/* Grid btn */}
+              </div>
+            </div>
+          </>
+        ) : (
+          // Actual content after loading
+          <>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium">Genre:</span>
+                <Select value={genreFilter} onValueChange={setGenreFilter}>
+                  <SelectTrigger className="w-40">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Genres</SelectItem>
+                    {genres?.map((genre: IGenresOption) => (
+                      <SelectItem
+                        key={genre.value}
+                        value={genre.value}
+                        className="capitalize"
+                      >
+                        {genre.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <Badge variant="outline">
+                {filteredBooks?.length} book
+                {filteredBooks?.length !== 1 ? 's' : ''}
+              </Badge>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium">View:</span>
+              <div className="flex rounded-md border">
+                <Button
+                  variant={viewMode === 'table' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setViewMode('table')}
+                  className="rounded-r-none"
+                >
+                  <List className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant={viewMode === 'grid' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setViewMode('grid')}
+                  className="rounded-l-none"
+                >
+                  <Grid className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          </>
+        )}
       </div>
-
       {/* Books Display */}
       <AllBooks
         filteredBooks={filteredBooks}
         viewMode={viewMode}
         genreFilter={genreFilter}
+        isLoading={isLoading}
       />
     </div>
   );

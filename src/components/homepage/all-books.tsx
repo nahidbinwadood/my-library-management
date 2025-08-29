@@ -12,12 +12,14 @@ interface IAllBooksDisplay {
   filteredBooks: Book[];
   viewMode: 'table' | 'grid';
   genreFilter: string;
+  isLoading: boolean;
 }
 
 const AllBooks = ({
   filteredBooks,
   viewMode,
   genreFilter,
+  isLoading,
 }: IAllBooksDisplay) => {
   const [open, setOpen] = useState<boolean>(false);
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
@@ -32,6 +34,7 @@ const AllBooks = ({
         <DataTable
           columns={BookColumns({ onDeleteRequest: handleDeleteRequest })}
           data={filteredBooks}
+          isLoading={isLoading}
           searchKey="title"
           searchPlaceholder="Search books by title..."
         />

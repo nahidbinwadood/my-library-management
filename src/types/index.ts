@@ -1,3 +1,5 @@
+import type { JSX } from 'react';
+
 export interface Book {
   _id: string;
   title: string;
@@ -22,9 +24,11 @@ export interface BorrowRecord {
 }
 
 export interface IBorrowSummary {
-  bookTitle: string;
-  isbn: string;
-  totalQuantityBorrowed: number;
+  book: {
+    title: string;
+    isbn: string;
+  };
+  totalQuantity: number;
 }
 
 export interface CreateBookData {
@@ -44,8 +48,8 @@ export interface BorrowBookData {
 export interface IStatCardData {
   id: number;
   title: string;
-  icon: React.ElementType;
-  stats: number | string;
+  icon: JSX.Element;
+  stats?: number | string;
   description: string;
 }
 

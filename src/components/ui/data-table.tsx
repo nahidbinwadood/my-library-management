@@ -22,12 +22,14 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { ChevronLeft, ChevronRight, Search } from 'lucide-react';
+import { Skeleton } from './skeleton';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   searchKey?: string;
   searchPlaceholder?: string;
+  isLoading?: boolean;
 }
 
 export function DataTable<TData, TValue>({
@@ -35,6 +37,7 @@ export function DataTable<TData, TValue>({
   data,
   searchKey,
   searchPlaceholder = 'Search...',
+  isLoading,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -98,7 +101,21 @@ export function DataTable<TData, TValue>({
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {isLoading ? (
+              // render 5 skeleton rows
+              [...Array(6)].map((_, i) => (
+                <TableRow key={`skeleton-${i}`}>
+                  {columns.map((_, j) => (
+                    <TableCell key={j}>
+                      <Skeleton
+                        className="h-6 w-[80%] animate-pulse  my-2
+                      "
+                      />
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
