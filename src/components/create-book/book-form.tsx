@@ -293,7 +293,7 @@ export default function BookForm({ initialData }: { initialData?: Book }) {
                 type="submit"
                 disabled={isLoading || updateLoading}
                 size="lg"
-                className="flex-1 sm:flex-initial cursor-pointer"
+                className="flex-1 sm:flex-initial cursor-pointer py-2.5"
               >
                 {isLoading || updateLoading ? (
                   <>

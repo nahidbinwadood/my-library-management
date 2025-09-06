@@ -4,7 +4,7 @@ A modern, high-performance frontend application built with React, TypeScript, an
 
 ## 🚀 Tech Stack
 
-- **React 19** - Modern React with hooks and concurrent features
+- **React 18** - Modern React with hooks and concurrent features
 - **TypeScript** - Type-safe JavaScript for better development experience
 - **Vite** - Lightning-fast build tool and development server
 - **ESLint** - Code linting and formatting
@@ -22,7 +22,7 @@ Before you begin, ensure you have the following installed:
 1. Clone the repository:
 
 ```bash
-git clone <[repository-url](https://github.com/nahidbinwadood/my-library-management)>
+git clone <https://github.com/nahidbinwadood/my-library-management>
 cd <my-library-management>
 ```
 
@@ -46,7 +46,7 @@ npm run dev
 yarn dev
 ```
 
-The application will be available at `http://localhost:3000`
+The application will be available at `http://localhost:5173`
 
 ### Production Build
 
@@ -97,10 +97,11 @@ yarn type-check
 ├── src/                    # Source code
 │   ├── components/         # Reusable UI components
 │   ├── pages/             # Page components
-│   ├── hooks/             # Custom React hooks
+│   ├── layouts/           # Custom Layouts
+│   ├── data/              # Dummy data
 │   ├── utils/             # Utility functions
 │   ├── types/             # TypeScript type definitions
-│   ├── styles/            # Global styles and themes
+│   ├── store/             # Redux + RTK
 │   ├── App.tsx            # Main App component
 │   ├── main.tsx           # Application entry point
 │   └── vite-env.d.ts      # Vite type declarations
@@ -219,7 +220,10 @@ This project is licensed under the [MIT License](LICENSE).
 
 ## 📚 Additional Resources
 
-- [React Documentation](https://react.dev/)
+- [React 19 Documentation](https://react.dev/)
 - [TypeScript Documentation](https://www.typescriptlang.org/docs/)
 - [Vite Documentation](https://vitejs.dev/)
+- [Tailwind CSS 4 Documentation](https://tailwindcss.com/docs)
+- [shadcn/ui Documentation](https://ui.shadcn.com/)
+- [Radix UI Documentation](https://www.radix-ui.com/)
 - [ESLint Documentation](https://eslint.org/docs/)

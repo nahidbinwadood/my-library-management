@@ -2,7 +2,7 @@ import { BookOpen, Github, Heart } from 'lucide-react';
 
 const Footer = () => {
   return (
-    <footer className="w-full border-t border-border/40 bg-background/50 backdrop-blur-sm">
+    <footer className="w-full border-t border-border/40 bg-background/50 backdrop-blur-sm px-4 md:px-8 2xl:px-0">
       <div className="container max-w-screen-2xl py-8 mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Brand Section */}
