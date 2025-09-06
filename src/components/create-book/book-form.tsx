@@ -72,7 +72,7 @@ export default function BookForm({ initialData }: { initialData?: Book }) {
       genre: initialData?.genre || '',
       isbn: initialData?.isbn || '',
       description: initialData?.description || '',
-      copies: initialData?.copies ?? 0,
+      copies: initialData?.copies ?? 1,
       available: initialData?.available ?? true,
     },
   });
@@ -299,7 +299,7 @@ export default function BookForm({ initialData }: { initialData?: Book }) {
                     </div>
                     <FormControl>
                       <Switch
-                        checked={numberOfCopies > 0 || field.value}
+                        checked={numberOfCopies > 0}
                         onCheckedChange={field.onChange}
                         disabled={numberOfCopies === 0}
                       />

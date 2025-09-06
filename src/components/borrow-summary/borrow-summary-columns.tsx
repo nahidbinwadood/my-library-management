@@ -6,7 +6,8 @@ import { Button } from '../ui/button';
 
 export const borrowSummaryColumns: ColumnDef<IBorrowSummary>[] = [
   {
-    accessorKey: 'book.title',
+    id: 'title',
+    accessorFn: (row) => row.book.title,
     header: ({ column }) => (
       <Button
         variant="ghost"
@@ -23,6 +24,7 @@ export const borrowSummaryColumns: ColumnDef<IBorrowSummary>[] = [
   },
   {
     accessorKey: 'isbn',
+    accessorFn: (row) => row.book.isbn,
     header: 'ISBN',
     cell: ({ row }) => (
       <div className="flex items-center gap-2">
@@ -38,7 +40,7 @@ export const borrowSummaryColumns: ColumnDef<IBorrowSummary>[] = [
         onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         className="h-auto p-0 font-semibold"
       >
-        Total Borrowed
+        Total Quantity Borrowed
         <ArrowUpDown className="ml-2 h-4 w-4" />
       </Button>
     ),

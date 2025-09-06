@@ -15,6 +15,7 @@ const BorrowSummary = () => {
   const { data: allBorrowedBooks, isLoading } = useGetAllBorrowsQuery({});
 
   const allBorrowedBooksData = allBorrowedBooks?.data || [];
+  console.log('allBorrowedBooksData', allBorrowedBooksData);
 
   const borrowStats = getAllBorrowStats(allBorrowedBooksData);
 
@@ -95,7 +96,7 @@ const BorrowSummary = () => {
           <DataTable
             columns={borrowSummaryColumns}
             data={allBorrowedBooksData}
-            searchKey="book.title"
+            searchKey="title"
             isLoading={isLoading}
             searchPlaceholder="Search books by title..."
           />

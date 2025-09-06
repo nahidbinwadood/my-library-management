@@ -203,7 +203,7 @@ const BorrowForm = ({ book, onSubmit, isLoading = false }: BorrowFormProps) => {
                   <div className="flex justify-between">
                     <span>Due Date:</span>
                     <span className="font-medium">
-                      {form.getValues('dueDate')
+                      {form.watch('dueDate')
                         ? new Date(
                             form.getValues('dueDate')
                           ).toLocaleDateString()
@@ -216,7 +216,12 @@ const BorrowForm = ({ book, onSubmit, isLoading = false }: BorrowFormProps) => {
               <div className="flex gap-4">
                 <Button
                   type="submit"
-                  disabled={isLoading || !isQuantityValid || !book.available}
+                  disabled={
+                    isLoading ||
+                    !isQuantityValid ||
+                    !book.available ||
+                    !form.watch('dueDate')
+                  }
                   className="flex-1 md:flex-initial"
                 >
                   {isLoading ? (
