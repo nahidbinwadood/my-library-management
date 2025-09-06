@@ -57,3 +57,20 @@ export interface IGenresOption {
   label: string;
   value: string;
 }
+
+export interface QueryState {
+  sortBy: string;
+  sort: 'asc' | 'desc';
+  filter: string;
+  page: number;
+  limit: number;
+  search?: string;
+}
+
+export interface StatsInput {
+  totalBooks: number;
+  availableBooks: number;
+  totalCopies: number;
+  borrowedCopies: number;
+  genresCount: number;
+}

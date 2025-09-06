@@ -1,5 +1,4 @@
-import type { QueryState } from '@/pages/homepage/page';
-import type { Book } from '@/types';
+import type { Book, QueryState } from '@/types';
 import { BookOpen, Plus } from 'lucide-react';
 import { Fragment, useState, type Dispatch, type SetStateAction } from 'react';
 import { Link } from 'react-router';
