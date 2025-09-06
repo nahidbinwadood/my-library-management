@@ -1,4 +1,4 @@
-# Project Frontend
+# Library Management
 
 A modern, high-performance frontend application built with React, TypeScript, and Vite.
 
