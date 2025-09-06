@@ -15,7 +15,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { genres } from '@/data';
 import { useGetAllBooksQuery } from '@/store/features/books/book-api';
-import type { Book, IGenresOption, IStatCardData } from '@/types';
+import type { IGenresOption, IStatCardData } from '@/types';
 import { BookOpen, Grid, List, TrendingUp } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
@@ -50,22 +50,21 @@ const Homepage = () => {
       filter: value,
     }));
   };
+
   // Stats data
   const statsData = useMemo(() => {
-    const totalBooks = allBooksData?.length ?? 0;
-    const availableBooks =
-      allBooksData?.filter((book: Book) => book.available && book.copies > 0)
-        .length ?? 0;
-    const totalCopies =
-      allBooksData?.reduce((sum: number, book: Book) => sum + book.copies, 0) ??
-      0;
-    const borrowedCopies =
-      allBooksData?.reduce((sum: number, book: Book) => {
-        return sum + Math.max(0, Math.floor(Math.random() * book.copies * 0.3));
-      }, 0) ?? 0;
+    const totalBooks = data?.stats?.totalBooks ?? 0;
+    const availableBooks = data?.stats?.availableBooks ?? 0;
+    const totalCopies = data?.stats?.totalCopies ?? 0;
+    const borrowedCopies = data?.stats?.borrowed ?? 0;
 
     return { totalBooks, availableBooks, totalCopies, borrowedCopies };
-  }, [allBooksData]);
+  }, [
+    data?.stats?.borrowed,
+    data?.stats?.availableBooks,
+    data?.stats?.totalBooks,
+    data?.stats?.totalCopies,
+  ]);
 
   const statsCardInfo: IStatCardData[] = [
     {
