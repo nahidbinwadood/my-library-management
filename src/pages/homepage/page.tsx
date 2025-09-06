@@ -19,25 +19,37 @@ import type { Book, IGenresOption, IStatCardData } from '@/types';
 import { BookOpen, Grid, List, TrendingUp } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
+export interface QueryState {
+  sortBy: string;
+  sort: 'asc' | 'desc';
+  filter: string;
+  page: number;
+  limit: number;
+  search?: string;
+}
+
 const Homepage = () => {
-  const query = {
+  const [query, setQuery] = useState<QueryState>({
     sortBy: 'createdAt',
     sort: 'asc',
-    limit: 200,
-  };
+    filter: 'all',
+    page: 1,
+    limit: 10,
+    search: '',
+  });
 
   const { data, isLoading, isError } = useGetAllBooksQuery(query);
+
   const allBooksData = data?.data;
-
   const [viewMode, setViewMode] = useState<'table' | 'grid'>('table');
-  const [genreFilter, setGenreFilter] = useState<string>('all');
 
-  // Filter books based on selected genre
-  const filteredBooks = useMemo(() => {
-    if (genreFilter === 'all') return allBooksData ?? [];
-    return allBooksData?.filter((book: Book) => book.genre === genreFilter);
-  }, [allBooksData, genreFilter]);
-
+  // handlers=>
+  const handleGenreFilter = (value: string) => {
+    setQuery((prev) => ({
+      ...prev,
+      filter: value,
+    }));
+  };
   // Stats data
   const statsData = useMemo(() => {
     const totalBooks = allBooksData?.length ?? 0;
@@ -105,8 +117,8 @@ const Homepage = () => {
             ))}
         {}
       </div>
-      {/* Filters and View Controls */}
 
+      {/* Filters and View Controls */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         {isLoading ? (
           // Skeleton while loading
@@ -134,7 +146,7 @@ const Homepage = () => {
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
                 <span className="text-sm font-medium">Genre:</span>
-                <Select value={genreFilter} onValueChange={setGenreFilter}>
+                <Select value={query.filter} onValueChange={handleGenreFilter}>
                   <SelectTrigger className="w-40">
                     <SelectValue />
                   </SelectTrigger>
@@ -153,8 +165,8 @@ const Homepage = () => {
                 </Select>
               </div>
               <Badge variant="outline">
-                {filteredBooks?.length} book
-                {filteredBooks?.length !== 1 ? 's' : ''}
+                {allBooksData?.length} book
+                {allBooksData?.length !== 1 ? 's' : ''}
               </Badge>
             </div>
 
@@ -184,10 +196,12 @@ const Homepage = () => {
       </div>
       {/* Books Display */}
       <AllBooks
-        filteredBooks={filteredBooks}
+        data={allBooksData ?? []}
         viewMode={viewMode}
-        genreFilter={genreFilter}
         isLoading={isLoading}
+        setQuery={setQuery}
+        pagination={data?.pagination ?? {}}
+        query={query}
       />
     </div>
   );

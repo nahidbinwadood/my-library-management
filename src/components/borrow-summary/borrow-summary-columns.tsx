@@ -1,6 +1,5 @@
 import type { IBorrowSummary } from '@/types';
 import type { ColumnDef } from '@tanstack/react-table';
-import { ArrowUpDown } from 'lucide-react';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 
@@ -15,7 +14,7 @@ export const borrowSummaryColumns: ColumnDef<IBorrowSummary>[] = [
         className="h-auto p-0 font-semibold"
       >
         Book Title
-        <ArrowUpDown className="ml-2 h-4 w-4" />
+        {/* <ArrowUpDown className="ml-2 h-4 w-4" /> */}
       </Button>
     ),
     cell: ({ row }) => (
@@ -41,7 +40,7 @@ export const borrowSummaryColumns: ColumnDef<IBorrowSummary>[] = [
         className="h-auto p-0 font-semibold"
       >
         Total Quantity Borrowed
-        <ArrowUpDown className="ml-2 h-4 w-4" />
+        {/* <ArrowUpDown className="ml-2 h-4 w-4" /> */}
       </Button>
     ),
     cell: ({ row }) => {

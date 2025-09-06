@@ -14,9 +14,9 @@ export const StatsCardSkeleton = () => {
         <div className="text-2xl font-bold ">
           <Skeleton className="h-6 w-16" />
         </div>
-        <p className="text-xs text-muted-foreground">
+        <div className="text-xs text-muted-foreground">
           <Skeleton className="h-3 w-32" />
-        </p>
+        </div>
       </CardContent>
     </Card>
   );

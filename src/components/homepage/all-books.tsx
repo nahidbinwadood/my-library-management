@@ -1,25 +1,29 @@
+import type { QueryState } from '@/pages/homepage/page';
 import type { Book } from '@/types';
 import { BookOpen, Plus } from 'lucide-react';
-import { Fragment, useState } from 'react';
+import { Fragment, useState, type Dispatch, type SetStateAction } from 'react';
 import { Link } from 'react-router';
 import DeleteAlert from '../common/delete-alert';
 import { Button } from '../ui/button';
-import { DataTable } from '../ui/data-table';
+import { DataTable, type PaginationInfo } from '../ui/data-table';
 import BookCard from './book-card';
 import BookColumns from './book-column';
 
 interface IAllBooksDisplay {
-  filteredBooks: Book[];
+  data: Book[];
   viewMode: 'table' | 'grid';
-  genreFilter: string;
   isLoading: boolean;
+  setQuery: Dispatch<SetStateAction<QueryState>>;
+  query: QueryState;
+  pagination: PaginationInfo;
 }
 
 const AllBooks = ({
-  filteredBooks,
+  data,
   viewMode,
-  genreFilter,
   isLoading,
+  pagination,
+  setQuery,
 }: IAllBooksDisplay) => {
   const [open, setOpen] = useState<boolean>(false);
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
@@ -33,28 +37,26 @@ const AllBooks = ({
       {viewMode === 'table' ? (
         <DataTable
           columns={BookColumns({ onDeleteRequest: handleDeleteRequest })}
-          data={filteredBooks}
+          data={data}
           isLoading={isLoading}
-          searchKey="title"
-          searchPlaceholder="Search books by title..."
+          pagination={pagination} // from backend
+          onPageChange={(page) => setQuery((prev) => ({ ...prev, page }))}
         />
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {filteredBooks.map((book: Book) => (
+          {data?.map((book: Book) => (
             <BookCard
               onDeleteRequest={handleDeleteRequest}
               key={book._id}
               book={book}
             />
           ))}
-          {filteredBooks.length === 0 && (
+          {data?.length === 0 && (
             <div className="col-span-full flex flex-col items-center justify-center py-12 text-center">
               <BookOpen className="h-12 w-12 text-muted-foreground/50 mb-4" />
               <h3 className="text-lg font-semibold mb-2">No books found</h3>
               <p className="text-muted-foreground mb-4">
-                {genreFilter === 'all'
-                  ? 'There are no books in the library yet.'
-                  : `No books found in the "${genreFilter}" genre.`}
+                There are no books in the library yet.
               </p>
               <Button asChild>
                 <Link to="/create-book">

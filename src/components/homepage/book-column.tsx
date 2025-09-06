@@ -1,13 +1,6 @@
 import type { Book } from '@/types';
 import type { ColumnDef } from '@tanstack/react-table';
-import {
-  ArrowUpDown,
-  BookOpen,
-  Edit,
-  Eye,
-  MoreHorizontal,
-  Trash2,
-} from 'lucide-react';
+import { BookOpen, Edit, Eye, MoreHorizontal, Trash2 } from 'lucide-react';
 import { Link } from 'react-router';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
@@ -34,7 +27,7 @@ const BookColumns = ({
         className="h-auto p-0 font-semibold"
       >
         Title
-        <ArrowUpDown className="ml-2 h-4 w-4" />
+        {/* <ArrowUpDown className="ml-2 h-4 w-4" /> */}
       </Button>
     ),
     cell: ({ row }) => (
@@ -57,7 +50,7 @@ const BookColumns = ({
         className="h-auto p-0 font-semibold"
       >
         Author
-        <ArrowUpDown className="ml-2 h-4 w-4" />
+        {/* <ArrowUpDown className="ml-2 h-4 w-4" /> */}
       </Button>
     ),
   },
@@ -88,7 +81,7 @@ const BookColumns = ({
         className="h-auto p-0 font-semibold"
       >
         Copies
-        <ArrowUpDown className="ml-2 h-4 w-4" />
+        {/* <ArrowUpDown className="ml-2 h-4 w-4" /> */}
       </Button>
     ),
     cell: ({ row }) => (

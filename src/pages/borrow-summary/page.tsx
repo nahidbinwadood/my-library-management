@@ -6,18 +6,16 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DataTable } from '@/components/ui/data-table';
 import { useGetAllBorrowsQuery } from '@/store/features/borrow/borrow-api';
-import { getAllBorrowStats } from '@/utils';
 
 import { BookOpen, FileText, Plus, TrendingUp } from 'lucide-react';
+import { useState } from 'react';
 import { Link } from 'react-router';
 
 const BorrowSummary = () => {
-  const { data: allBorrowedBooks, isLoading } = useGetAllBorrowsQuery({});
+  const [query, setQuery] = useState({ page: 1, limit: 10 });
+  const { data: allBorrowedBooks, isLoading } = useGetAllBorrowsQuery(query);
 
   const allBorrowedBooksData = allBorrowedBooks?.data || [];
-  console.log('allBorrowedBooksData', allBorrowedBooksData);
-
-  const borrowStats = getAllBorrowStats(allBorrowedBooksData);
 
   // borrow summary stats:
   const borrowSummaryStats = [
@@ -25,31 +23,31 @@ const BorrowSummary = () => {
       id: 1,
       title: 'Books Borrowed',
       icon: <BookOpen className="h-4 w-4 text-muted-foreground" />,
-      stats: borrowStats?.booksBorrowed,
+      stats: allBorrowedBooks?.stats?.uniqueTitlesBorrowed,
       description: 'Unique titles borrowed',
     },
     {
       id: 2,
       title: 'Total Copies',
-      stats: borrowStats?.totalCopies,
+      stats: allBorrowedBooks?.stats?.totalBorrowedCopies,
       description: 'Total borrowed copies',
       icon: <TrendingUp className="h-4 w-4 text-muted-foreground" />,
     },
     {
       id: 3,
       title: 'Average per Book',
-      stats: borrowStats?.averagePerBook,
+      stats: allBorrowedBooks?.stats?.averageCopiesPerBook,
       description: 'Copies per book',
       icon: <FileText className="h-4 w-4 text-muted-foreground" />,
     },
     {
       id: 4,
       title: 'Most Popular',
-      stats: borrowStats?.mostPopular?.title,
+      stats: allBorrowedBooks?.stats?.mostPopularBook,
       description: 'Most borrowed book',
       icon: (
         <Badge variant="default" className="text-xs">
-          {borrowStats?.mostPopular?.totalQuantity}
+          {allBorrowedBooks?.stats?.mostPopularBookCopies}
         </Badge>
       ),
     },
@@ -96,7 +94,8 @@ const BorrowSummary = () => {
           <DataTable
             columns={borrowSummaryColumns}
             data={allBorrowedBooksData}
-            searchKey="title"
+            pagination={allBorrowedBooks?.pagination ?? {}}
+            onPageChange={(page) => setQuery((prev) => ({ ...prev, page }))}
             isLoading={isLoading}
             searchPlaceholder="Search books by title..."
           />

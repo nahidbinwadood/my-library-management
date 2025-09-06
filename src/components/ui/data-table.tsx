@@ -1,16 +1,3 @@
-import {
-  flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  useReactTable,
-  type ColumnDef,
-  type ColumnFiltersState,
-  type SortingState,
-} from '@tanstack/react-table';
-import { useState } from 'react';
-
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -21,8 +8,23 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import {
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+  type ColumnDef,
+  type SortingState,
+} from '@tanstack/react-table';
 import { ChevronLeft, ChevronRight, Search } from 'lucide-react';
+import { useState } from 'react';
 import { Skeleton } from './skeleton';
+
+export interface PaginationInfo {
+  total: number;
+  totalPages: number;
+  currentPage: number;
+  pageSize: number;
+}
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -30,6 +32,22 @@ interface DataTableProps<TData, TValue> {
   searchKey?: string;
   searchPlaceholder?: string;
   isLoading?: boolean;
+
+  // 🔥 server-side controls
+  pagination?: PaginationInfo;
+  onPageChange?: (page: number) => void;
+  onSearchChange?: (value: string) => void;
+  onSortChange?: (sortBy: string, sort: 'asc' | 'desc') => void;
+}
+
+interface DataTableProps<TData, TValue> {
+  columns: ColumnDef<TData, TValue>[];
+  data: TData[];
+  searchKey?: string;
+  searchPlaceholder?: string;
+  isLoading?: boolean;
+  pagination?: PaginationInfo; // <-- from backend
+  onPageChange?: (page: number) => void; // <-- to trigger API call
 }
 
 export function DataTable<TData, TValue>({
@@ -38,50 +56,40 @@ export function DataTable<TData, TValue>({
   searchKey,
   searchPlaceholder = 'Search...',
   isLoading,
+  pagination,
+  onPageChange,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [search, setSearch] = useState('');
 
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
+    state: { sorting },
     onSortingChange: setSorting,
-    getSortedRowModel: getSortedRowModel(),
-    onColumnFiltersChange: setColumnFilters,
-    getFilteredRowModel: getFilteredRowModel(),
-    state: {
-      sorting,
-      columnFilters,
-    },
-    initialState: {
-      pagination: {
-        pageSize: 10,
-      },
-    },
+    manualPagination: true, // <-- important for server-side
+    pageCount: pagination?.totalPages ?? -1, // let server control pages
   });
 
   return (
     <div className="space-y-4">
+      {/* 🔍 Search */}
       {searchKey && (
         <div className="flex items-center space-x-2">
           <div className="relative flex-1 max-w-sm">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               placeholder={searchPlaceholder}
-              value={
-                (table.getColumn(searchKey)?.getFilterValue() as string) ?? ''
-              }
-              onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-                table.getColumn(searchKey)?.setFilterValue(event.target.value)
-              }
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
               className="pl-10"
             />
           </div>
         </div>
       )}
 
+      {/* 📊 Table */}
       <div className="rounded-md border bg-card">
         <Table>
           <TableHeader>
@@ -102,26 +110,19 @@ export function DataTable<TData, TValue>({
           </TableHeader>
           <TableBody>
             {isLoading ? (
-              // render 5 skeleton rows
+              // skeleton rows
               [...Array(6)].map((_, i) => (
                 <TableRow key={`skeleton-${i}`}>
                   {columns.map((_, j) => (
                     <TableCell key={j}>
-                      <Skeleton
-                        className="h-6 w-[80%] animate-pulse  my-2
-                      "
-                      />
+                      <Skeleton className="h-6 w-[80%] animate-pulse my-2" />
                     </TableCell>
                   ))}
                 </TableRow>
               ))
-            ) : table.getRowModel().rows?.length ? (
+            ) : data.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && 'selected'}
-                  className="hover:bg-muted/50"
-                >
+                <TableRow key={row.id} className="hover:bg-muted/50">
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
                       {flexRender(
@@ -146,43 +147,39 @@ export function DataTable<TData, TValue>({
         </Table>
       </div>
 
-      <div className="flex items-center justify-between space-x-2 py-4">
-        <div className="text-sm text-muted-foreground">
-          Showing{' '}
-          {table.getState().pagination.pageIndex *
-            table.getState().pagination.pageSize +
-            1}{' '}
-          to{' '}
-          {Math.min(
-            (table.getState().pagination.pageIndex + 1) *
-              table.getState().pagination.pageSize,
-            table.getFilteredRowModel().rows.length
-          )}{' '}
-          of {table.getFilteredRowModel().rows.length} entries
+      {/* 📑 Pagination */}
+      {pagination && (
+        <div className="flex items-center justify-between space-x-2 py-4">
+          <div className="text-sm text-muted-foreground">
+            Showing {(pagination.currentPage - 1) * pagination.pageSize + 1} to{' '}
+            {Math.min(
+              pagination.currentPage * pagination.pageSize,
+              pagination.total
+            )}{' '}
+            of {pagination.total} entries
+          </div>
+          <div className="gap-x-2 flex items-center">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onPageChange?.(pagination.currentPage - 1)}
+              disabled={pagination.currentPage === 1}
+            >
+              <ChevronLeft className="h-4 w-4" />
+              Previous
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onPageChange?.(pagination.currentPage + 1)}
+              disabled={pagination.currentPage >= pagination.totalPages}
+            >
+              Next
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
-        <div className="gap-x-2 flex items-center">
-          <Button
-            variant="outline"
-            size="sm"
-            className="cursor-pointer"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            <ChevronLeft className="h-4 w-4" />
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            className="cursor-pointer"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Next
-            <ChevronRight className="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
+      )}
     </div>
   );
 }

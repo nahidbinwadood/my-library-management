@@ -11,9 +11,10 @@ const borrowApi = baseApi.injectEndpoints({
       invalidatesTags: ['borrow', 'books'],
     }),
     getAllBorrows: builder.query({
-      query: () => ({
+      query: (params) => ({
         url: '/borrow',
         method: 'GET',
+        params,
       }),
       providesTags: ['borrow'],
     }),
